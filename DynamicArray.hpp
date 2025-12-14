@@ -121,42 +121,16 @@ public:
 		other.capacity_ = 0;
 	}
 
-	DynamicArray& operator=(const DynamicArray& other) {
-		if (this != &other) {
-			clear();
-			free(buf_);
-
-			capacity_ = other.capacity_;
-			length_ = other.length_;
-			buf_ = static_cast<T*>(malloc(capacity_ * sizeof(T)));
-
-			for (int i = 0; i < length_; ++i) {
-				new (buf_ + i) T(other.buf_[i]);
-			}
-		}
-		return *this;
-	}
-
-	DynamicArray& operator=(DynamicArray&& other) noexcept {
-		if (this != &other) {
-			clear();
-			free(buf_);
-
-			buf_ = other.buf_;
-			length_ = other.length_;
-			capacity_ = other.capacity_;
-
-			other.buf_ = nullptr;
-			other.length_ = 0;
-			other.capacity_ = 0;
-		}
-		return *this;
-	}
-
 	void swap(DynamicArray& other) noexcept {
 		std::swap(buf_, other.buf_);
 		std::swap(length_, other.length_);
 		std::swap(capacity_, other.capacity_);
+	}
+
+	//copy swap
+	DynamicArray& operator=(DynamicArray other) noexcept {
+		swap(other);
+		return *this;
 	}
 
 	int insert(const T& value)
@@ -169,9 +143,19 @@ public:
 	int insert(int index, const T& value) {
 		assert(index >= 0 && index <= length_);
 		check_capacity();
-		for (int i = length_; i > index; --i) {
-			new (buf_ + i) T(buf_[i - 1]);
-			buf_[i - 1].~T();
+		//Теперь проверяем на мув семантику
+		if (std::is_move_constructible_v<T>) {
+			for (int i = length_; i > index; --i) {
+				new (buf_ + i) T(std::move(buf_[i - 1]));
+				buf_[i - 1].~T();
+			}
+		}
+
+		else {
+			for (int i = length_; i > index; --i) {
+				new (buf_ + i) T(buf_[i - 1]);
+				buf_[i - 1].~T();
+			}
 		}
 
 		new (buf_ + index) T(value);
@@ -191,10 +175,19 @@ public:
 		assert(index >= 0 && index <= length_);
 
 		check_capacity();
+		//Теперь проверяем на мув семантику
+		if (std::is_move_constructible_v<T>) {
+			for (int i = length_; i > index; --i) {
+				new (buf_ + i) T(std::move(buf_[i - 1]));
+				buf_[i - 1].~T();
+			}
+		}
 
-		for (int i = length_; i > index; --i) {
-			new (buf_ + i) T(std::move(buf_[i - 1]));
-			buf_[i - 1].~T();
+		else {
+			for (int i = length_; i > index; --i) {
+				new (buf_ + i) T(buf_[i - 1]);
+				buf_[i - 1].~T();
+			}
 		}
 
 		new (buf_ + index) T(std::move(value));

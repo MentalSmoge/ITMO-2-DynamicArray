@@ -268,7 +268,7 @@ TEST(DynamicArrayTest, ClearArray) {
     EXPECT_EQ(arr.size(), 1);
     EXPECT_EQ(arr[0], 100);
 }
-TEST(DynamicArrayTest, InsertAndAccessString) {
+TEST(DynamicArrayTest, InsertAccessRemoveString) {
     DynamicArray<std::string> arr;
     std::string hello = "Hello";
     std::string test = "Test";
@@ -280,6 +280,18 @@ TEST(DynamicArrayTest, InsertAndAccessString) {
     EXPECT_EQ(arr.size(), 3);
     EXPECT_EQ(arr[0], "Hello");
     EXPECT_EQ(arr[1], "World");
+    EXPECT_EQ(arr[2], "Test");
+
+    arr.insert(1, "Beautiful");
+    EXPECT_EQ(arr[0], "Hello");
+    EXPECT_EQ(arr[1], "Beautiful");
+    EXPECT_EQ(arr[2], "World");
+    EXPECT_EQ(arr[3], "Test");
+
+    arr.remove(2);
+    EXPECT_EQ(arr.size(), 3);
+    EXPECT_EQ(arr[0], "Hello");
+    EXPECT_EQ(arr[1], "Beautiful");
     EXPECT_EQ(arr[2], "Test");
 }
 
@@ -298,8 +310,8 @@ TEST(DynamicArrayTest, ModifyElementsString) {
     EXPECT_EQ(arr[1], "tiger");
     EXPECT_EQ(arr[2], "bear");
 
-    // Модификация с использованием оператора +=
     arr[0] += " king";
     EXPECT_EQ(arr[0], "lion king");
 }
+//Добавить все тесты стринг
 #pragma endregion
