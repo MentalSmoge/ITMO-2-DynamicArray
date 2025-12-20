@@ -313,5 +313,32 @@ TEST(DynamicArrayTest, ModifyElementsString) {
     arr[0] += " king";
     EXPECT_EQ(arr[0], "lion king");
 }
-//Добавить все тесты стринг
+
+TEST(DynamicArrayTest, ArrayString) {
+    DynamicArray<std::string> arr1;
+
+    arr1.insert("cat");
+    arr1.insert("dog");
+    arr1.insert("bird");
+
+    DynamicArray<std::string> arr2 = arr1;
+
+    EXPECT_EQ(arr1[0], arr2[0]);
+    EXPECT_EQ(arr1[1], arr2[1]);
+    EXPECT_EQ(arr1[2], arr2[2]);
+
+    arr1[0] = "king";
+    EXPECT_NE(arr1[0], arr2[0]);
+    EXPECT_EQ(arr2[0], "cat");
+    EXPECT_EQ(arr1[1], arr2[1]);
+    EXPECT_EQ(arr1[2], arr2[2]);
+
+
+    DynamicArray<std::string> arr3 = std::move(arr2);
+    EXPECT_NE(arr1[0], arr3[0]);
+    EXPECT_EQ(arr3[0], "cat");
+    EXPECT_EQ(arr1[1], arr3[1]);
+    EXPECT_EQ(arr1[2], arr3[2]);
+    EXPECT_EQ(arr2.size(), 0);
+}
 #pragma endregion
